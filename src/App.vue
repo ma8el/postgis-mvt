@@ -1,20 +1,17 @@
 <script setup lang="ts">
 import Map from './components/Map.vue'
+import Wrapper from './components/Wrapper.vue'
+
 components: {
   Map
+  Wrapper
 }
 </script>
 
 <template>
-  <div class="mapContainer">
-    <Map />
-  </div>
+    <v-app>
+      <Wrapper>
+        <Map />
+      </Wrapper>
+    </v-app>
 </template>
-
-<style>
-
-.mapContainer {
-  width: 100%;
-}
-
-</style>

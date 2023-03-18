@@ -20,8 +20,7 @@ onMounted(() => {
 
 #map {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  height: 90%;
   width: 100%;
 }
 
