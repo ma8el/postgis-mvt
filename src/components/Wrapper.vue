@@ -11,7 +11,7 @@
     <div class="content">
       <slot></slot>
     </div>
-    <v-footer class="d-flex flex-column ma-0 pa-0" app>
+    <v-footer class="d-flex flex-column ma-0 pa-0 w-100" app>
       <div class="bg-teal d-flex w-100 align-center px-4">
         <strong>Checkout my Map!</strong>
         <v-spacer></v-spacer>
