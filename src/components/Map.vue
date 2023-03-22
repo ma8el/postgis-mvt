@@ -1,32 +1,49 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.vectorgrid';
-
-onMounted(() => {
-  const map = L.map('map').setView([50.110924, 8.682127], 13);
-  L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
-
-  const vectorTileOptions = {
-    vectorTileLayerStyles: {
-      layerName: (properties: any, zoom: any) => ({
-        color: "#3388ff",
-        weight: 2,
-        fillColor: "#3388ff",
-        fillOpacity: 0.5,
+  import { onMounted } from 'vue'
+  import 'ol/ol.css';
+  import Map from 'ol/Map';
+  import View from 'ol/View';
+  import TileLayer from 'ol/layer/Tile';
+  import OSM from 'ol/source/OSM';
+  import MVT from 'ol/format/MVT';
+  import VectorTileLayer from 'ol/layer/VectorTile';
+  import VectorTileSource from 'ol/source/VectorTile';
+  import {Stroke, Style, Fill} from 'ol/style.js';
+  import { fromLonLat } from 'ol/proj';
+  
+  onMounted(() => {
+    var vtLayer = new VectorTileLayer({
+      declutter: false,
+      source: new VectorTileSource({
+        format: new MVT(),
+        url: 'http://localhost:8000/mvt/postgis_mvt_source_mercator/{z}/{x}/{y}.mvt',
       }),
-    },
-    interactive: true,
-    crossOrigin: 'anonymous',
-    getFeatureId: (feature: any) => feature.properties.id,
-  };
-
-  const url = `http://localhost:8000/mvt/postgis_mvt_source_mercator/{z}/{x}/{y}.mvt`;
-  L.vectorGrid.protobuf(url, vectorTileOptions).addTo(map);
-})
+      renderMode: 'vector',
+      style: new Style({
+          stroke: new Stroke({
+            color: 'blue',
+            width: 1
+          }),
+      fill: new Fill({
+        color: 'rgba(0, 0, 255, 0.4)'
+      })
+      })
+    });
+  
+    const map = new Map({
+      target: 'map',
+      layers: [
+        new TileLayer({
+          source: new OSM(),
+        }),
+        vtLayer,
+      ],
+      view: new View({
+        center: fromLonLat([8.6821, 50.1109]),
+        zoom: 13,
+      }),
+    })
+  });
 </script>
 
 <template>
