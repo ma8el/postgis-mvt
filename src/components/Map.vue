@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue'
+  import { ref, onMounted } from 'vue'
   import 'ol/ol.css';
   import Map from 'ol/Map';
   import View from 'ol/View';
@@ -11,12 +11,22 @@
   import {Stroke, Style, Fill} from 'ol/style.js';
   import { fromLonLat } from 'ol/proj';
   
+  const props = defineProps<{
+                  host: String;
+                  port: Number;
+                  table: String;
+                }>();
+
+  const host = ref(props.host);
+  const port = ref(props.port);
+  const table = ref(props.table);
+
   onMounted(() => {
     var vtLayer = new VectorTileLayer({
       declutter: false,
       source: new VectorTileSource({
         format: new MVT(),
-        url: 'http://localhost:8000/mvt/postgis_mvt_source_mercator/{z}/{x}/{y}.mvt',
+        url: `http://${host.value}:${port.value}/mvt/${table.value}/{z}/{x}/{y}.mvt`,
       }),
       renderMode: 'vector',
       style: new Style({
@@ -25,7 +35,7 @@
             width: 1
           }),
       fill: new Fill({
-        color: 'rgba(0, 0, 255, 0.4)'
+        color: 'rgba(176, 196, 222, 0.4)'
       })
       })
     });

@@ -11,7 +11,7 @@ components: {
 <template>
     <v-app>
       <Wrapper>
-        <Map />
+        <Map host="localhost" :port=8000 table="osm_buildings"/>
       </Wrapper>
     </v-app>
 </template>
