@@ -1,8 +1,6 @@
 <template>
     <header>
       <v-toolbar class="bg-teal" density="compact">
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
         <v-toolbar-title>Postgis MVT</v-toolbar-title>
 
         <v-spacer></v-spacer>
