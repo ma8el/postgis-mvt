@@ -28,24 +28,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/mvt/{table_name}/{z}/{x}/{y}.mvt", response_class=Response)
-async def get_mvt(table_name: str, z: int, x: int, y: int) -> Response:
+def get_mvt_query(table_name: str, z: int, x: int, y: int) -> str:
     """
-    Get MVT data for a specific table and tile coordinates.
+    Construct the SQL query to fetch the MVT data.
     """
-    conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        dbname=db_name,
-        user=db_user,
-        password=db_password
-    )
-
-    # Construct the SQL query to fetch the MVT data
-    query = f"""
+    return f"""
         SELECT ST_AsMVT(q, '{table_name}', 4096, 'geom')
         FROM (
-            SELECT id, ST_AsMVTGeom(
+            SELECT osm_id, name, building, ST_AsMVTGeom(
                 geom,
                 ST_TileEnvelope({z}, {x}, {y}),
                 4096,
@@ -59,6 +49,21 @@ async def get_mvt(table_name: str, z: int, x: int, y: int) -> Response:
             )
         ) AS q
     """
+
+@app.get("/api/v1/mvt/{table_name}/{z}/{x}/{y}.mvt", response_class=Response)
+async def get_mvt(table_name: str, z: int, x: int, y: int) -> Response:
+    """
+    Get MVT data for a specific table and tile coordinates.
+    """
+    conn = psycopg2.connect(
+        host=db_host,
+        port=db_port,
+        dbname=db_name,
+        user=db_user,
+        password=db_password
+    )
+
+    query = get_mvt_query(table_name, z, x, y)
 
     with conn.cursor() as cur:
         cur.execute(query)
