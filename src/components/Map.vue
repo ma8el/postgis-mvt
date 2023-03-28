@@ -2,8 +2,8 @@
   import { ref, onMounted } from 'vue'
   import 'ol/ol.css';
   import Map from 'ol/Map';
-  import View from 'ol/View';
   import MVT from 'ol/format/MVT';
+  import View from 'ol/View';
   import OSM from 'ol/source/OSM';
   import TileLayer from 'ol/layer/Tile';
   import VectorTileLayer from 'ol/layer/VectorTile';
@@ -21,7 +21,8 @@
   const port = ref(props.port);
   const table = ref(props.table);
 
-  const accessToken = import.meta.env.VITE_MAPBOX_TOKEN
+  const buildingName = ref('Click on a building');
+  const buildingType = ref('Click on a building');
 
   onMounted(() => {
     var vtLayer = new VectorTileLayer({
@@ -75,6 +76,8 @@
 
     map.on('click', function(evt) {
       map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+        buildingType.value = feature.get('building');
+        buildingName.value = feature.get('name');
         console.log(feature.getProperties());
       });
     });
@@ -82,7 +85,11 @@
 </script>
 
 <template>
-  <div id="map"></div>
+  <div id="map" ref="map"></div>
+  <div class="metadata">
+    <li class="no-bullet">Building Name: {{ buildingName }}</li>
+    <li class="no-bullet">Building Type: {{ buildingType }}</li>
+  </div>
 </template>
 
 <style scoped>
@@ -92,5 +99,17 @@
   height: 90%;
   width: 100%;
 }
+.no-bullet {
+  list-style-type: none;
+}
+
+.metadata {
+  position: absolute;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  font-size: 1.2em;
+  min-width: 200px;
+}
+
 
 </style>
