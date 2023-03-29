@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import Map from './components/Map.vue'
 import Wrapper from './components/Wrapper.vue'
+
+const host = ref('localhost')
+const table = ref('osm_buildings_distinct')
 
 components: {
   Map
@@ -11,7 +15,7 @@ components: {
 <template>
     <v-app>
       <Wrapper>
-        <Map host="localhost" :port=8000 table="osm_buildings"/>
+        <Map :host="host" :port=8000 :table="table"/>
       </Wrapper>
     </v-app>
 </template>
