@@ -23,6 +23,9 @@
 
   const buildingName = ref('Click on a building');
   const buildingType = ref('Click on a building');
+  const numberOfBuildings = ref(0);
+  const numberOfRetailBuildings = ref(0);
+  const numberOfIndustrialBuildings = ref(0);
 
   onMounted(() => {
     var vtLayer = new VectorTileLayer({
@@ -78,17 +81,51 @@
       map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
         buildingType.value = feature.get('building');
         buildingName.value = feature.get('name');
-        console.log(feature.getProperties());
       });
     });
-  });
+
+    map.on('pointermove', function(evt) {
+      if (evt.dragging) {
+        return;
+      }
+      var pixel = map.getEventPixel(evt.originalEvent);
+      var hit = map.hasFeatureAtPixel(pixel);
+      map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+    });
+
+    map.on('moveend', function(evt) {
+      numberOfBuildings.value = 0;
+      numberOfIndustrialBuildings.value = 0;
+      numberOfRetailBuildings.value = 0;
+      let extent = map.getView().calculateExtent(map.getSize());
+      const source = vtLayer.getSource();
+      if (source) {
+        const features = source.getFeaturesInExtent(extent);
+        features.forEach((feature) => {
+          if (feature.get('building') === 'retail') {
+            numberOfRetailBuildings.value += 1;
+          }
+          else if (feature.get('building') === 'industrial') {
+            numberOfIndustrialBuildings.value += 1;
+          }
+        });
+        numberOfBuildings.value = features.length;
+      }
+      })
+    });
 </script>
 
 <template>
   <div id="map" ref="map"></div>
   <div class="metadata">
+    <h2>Selected Building</h2>
     <li class="no-bullet">Building Name: {{ buildingName }}</li>
     <li class="no-bullet">Building Type: {{ buildingType }}</li>
+    <hr>
+    <h2>Buildings in View</h2>
+    <li class="no-bullet">Number of Buildings: {{ numberOfBuildings }}</li>
+    <li class="no-bullet">Number of Retail Buildings: {{ numberOfRetailBuildings }}</li>
+    <li class="no-bullet">Number of Industrial Buildings: {{ numberOfIndustrialBuildings }}</li>
   </div>
 </template>
 
@@ -107,8 +144,10 @@
   position: absolute;
   right: 0;
   background-color: rgba(255, 255, 255, 0.8);
-  font-size: 1.2em;
-  min-width: 200px;
+  font-size: 1.1em;
+  font-weight: bold;
+  width: 300px;
+  height: 100vh;
 }
 
 
