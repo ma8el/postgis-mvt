@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import 'ol/ol.css';
   import Map from 'ol/Map';
   import MVT from 'ol/format/MVT';
@@ -10,6 +10,10 @@
   import VectorTileSource from 'ol/source/VectorTile';
   import {Stroke, Style, Fill} from 'ol/style.js';
   import { fromLonLat } from 'ol/proj';
+  import { Bar } from 'vue-chartjs'
+  import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+
+  ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
   
   const props = defineProps<{
                   host: String;
@@ -23,9 +27,40 @@
 
   const buildingName = ref('Click on a building');
   const buildingType = ref('Click on a building');
-  const numberOfBuildings = ref(0);
+  const numberOfBuildings = ref(50);
   const numberOfRetailBuildings = ref(0);
   const numberOfIndustrialBuildings = ref(0);
+
+//  const chartData = ref(
+//    [numberOfBuildings.value,
+//    numberOfRetailBuildings.value,
+//    numberOfIndustrialBuildings.value]
+//  );
+
+  const options = ref({
+    responsive: true,
+  })
+
+  const data = computed(() => {
+    return {
+    labels: ['Buildings', 'Retail', 'Industry'],
+    datasets: [{
+      label: '# of Buildings',
+      data: [numberOfBuildings.value, numberOfRetailBuildings.value, numberOfIndustrialBuildings.value],
+      backgroundColor: [
+        'rgba(176, 196, 222, 0.5)',
+        'rgba(192, 255, 192, 0.5)',
+        'rgba(255, 192, 192, 0.5)',
+      ],
+      borderColor: [
+        'rgba(176, 196, 222, 1)',
+        'rgba(192, 255, 192, 1)',
+        'rgba(255, 192, 192, 1)',
+      ],
+      borderWidth: 1
+    }]
+    }
+  });
 
   onMounted(() => {
     var vtLayer = new VectorTileLayer({
@@ -110,6 +145,12 @@
           }
         });
         numberOfBuildings.value = features.length;
+        data.value.datasets[0].data = [
+          numberOfBuildings.value,
+          numberOfRetailBuildings.value,
+          numberOfIndustrialBuildings.value
+        ]
+        console.log(data.value.datasets[0])
       }
       })
     });
@@ -126,6 +167,11 @@
     <li class="no-bullet">Number of Buildings: {{ numberOfBuildings }}</li>
     <li class="no-bullet">Number of Retail Buildings: {{ numberOfRetailBuildings }}</li>
     <li class="no-bullet">Number of Industrial Buildings: {{ numberOfIndustrialBuildings }}</li>
+    <Bar
+      id="my-chart-id"
+      :options="options"
+      :data="data"
+    />
   </div>
 </template>
 
