@@ -31,12 +31,6 @@
   const numberOfRetailBuildings = ref(0);
   const numberOfIndustrialBuildings = ref(0);
 
-//  const chartData = ref(
-//    [numberOfBuildings.value,
-//    numberOfRetailBuildings.value,
-//    numberOfIndustrialBuildings.value]
-//  );
-
   const options = ref({
     responsive: true,
   })
